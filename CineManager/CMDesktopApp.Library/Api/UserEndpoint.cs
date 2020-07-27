@@ -78,5 +78,47 @@ namespace CMDesktopApp.Library.Api
             }
         }
 
+        public async Task<Dictionary<string, string>> GetAllRoles()
+        {
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/user/admin/roles"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<Dictionary<string, string>>();
+                    return result;
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+        public async Task AddUserToRole(string userId, string roleName)
+        {
+            var data = new { userId, roleName };
+
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/roles/add", data))
+            {
+                if (response.IsSuccessStatusCode == false)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+        public async Task RemoveUserFromRole(string userId, string roleName)
+        {
+            var data = new { userId, roleName };
+
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/User/Admin/roles/remove", data))
+            {
+                if (response.IsSuccessStatusCode == false)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
     }
 }

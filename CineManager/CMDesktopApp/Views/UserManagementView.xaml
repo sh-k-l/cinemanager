@@ -12,6 +12,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
@@ -26,34 +28,36 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <!--COL 1-->
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="10">
             <TextBlock FontSize="14">Search Type</TextBlock>
             <ComboBox  x:Name="SearchTypes" SelectedItem="{Binding SelectedSearchType}" MinWidth="150" />
         </StackPanel>
 
-        <!-- Search by email -->        
-        <StackPanel Grid.Row="2" Grid.Column="1"
+        <!-- Search by email -->
+        <StackPanel Grid.Row="2" Grid.Column="1" Margin="10"
                      Visibility="{Binding ShowEmailSearchForm, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock TextAlignment="Center" VerticalAlignment="Center" Margin="0 0 10 0">Email:</TextBlock>
                 <TextBox MinWidth="150" x:Name="Email"></TextBox>
                 <Button Padding="5" x:Name="SearchByEmail">Search</Button>
-            </StackPanel>            
+            </StackPanel>
         </StackPanel>
 
         <!--Results-->
-        <ListBox Name="Users" Grid.Row="3" Grid.Column="1" MinHeight="200" Margin="10">
+        <ListBox x:Name="Users"  SelectedItem="SelectedUser" Grid.Row="3" Grid.Column="1" MinHeight="200" MinWidth="200" Margin="10">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="{Binding Email}"/>
                         <TextBlock Text="{Binding Id}" FontSize="10"/>
                     </StackPanel>
-                </DataTemplate>                
+                </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 

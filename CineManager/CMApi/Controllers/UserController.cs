@@ -8,6 +8,7 @@ using CMApi.Data;
 using CMApi.Library;
 using CMApi.Library.DataAccess;
 using CMApi.Library.Models;
+using CMApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +19,7 @@ namespace CMApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -40,8 +41,8 @@ namespace CMApi.Controllers
             return user;
         }
 
+
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         [Route("/api/user/admin/getusers")]
         public List<ApplicationUserModel> GetAllUsers(string type)
         {
@@ -69,7 +70,6 @@ namespace CMApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         [Route("/api/user/admin/findbyemail")]
         public async Task<ApplicationUserModel> SearchByEmail(string email)
         {
@@ -95,6 +95,32 @@ namespace CMApi.Controllers
 
             return u;
 
+        }
+
+        [HttpGet]
+        [Route("/api/user/admin/roles")]
+        public Dictionary<string, string> GetAllRoles()
+        {
+            var roles = _context.Roles.ToDictionary(x => x.Id, x => x.Name);
+            return roles;
+        }
+
+        [HttpPost]
+        [Route("/api/user/admin/roles/add")]
+        public async Task AddARole(UserRolePairModel pairing)
+        {
+            var user = await _userManager.FindByIdAsync(pairing.UserId);
+
+            await _userManager.AddToRoleAsync(user, pairing.RoleName);
+        }
+
+        [HttpPost]
+        [Route("/api/user/admin/roles/remove")]
+        public async Task RemoveARole(UserRolePairModel pairing)
+        {
+            var user = await _userManager.FindByIdAsync(pairing.UserId);
+
+            await _userManager.RemoveFromRoleAsync(user, pairing.RoleName);
         }
 
     }
