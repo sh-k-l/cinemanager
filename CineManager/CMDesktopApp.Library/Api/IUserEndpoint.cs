@@ -7,6 +7,6 @@ namespace CMDesktopApp.Library.Api
     public interface IUserEndpoint
     {
         Task<UserModel> FindUserByEmail(string email);
-        Task<List<UserModel>> GetAllUsers();
+        Task<List<UserModel>> GetUsers(UserManagementSearchType type);
     }
 }

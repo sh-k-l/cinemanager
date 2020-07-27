@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace CMApi.Controllers
 {
@@ -41,8 +42,8 @@ namespace CMApi.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        [Route("/api/user/admin/getall")]
-        public List<ApplicationUserModel> GetAllUsers()
+        [Route("/api/user/admin/getusers")]
+        public List<ApplicationUserModel> GetAllUsers(string type)
         {
             List<ApplicationUserModel> output = new List<ApplicationUserModel>();
 
@@ -64,7 +65,7 @@ namespace CMApi.Controllers
                 output.Add(u);
             }
 
-            return output;
+            return output.Where(x => x.Roles.Values.IndexOf(type) != -1).ToList();
         }
 
         [HttpGet]

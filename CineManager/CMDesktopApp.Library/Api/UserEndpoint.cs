@@ -17,11 +17,18 @@ namespace CMDesktopApp.Library.Api
             _apiHelper = apiHelper;
         }
 
-        public async Task<List<UserModel>> GetAllUsers()
+        public async Task<List<UserModel>> GetUsers(UserManagementSearchType type)
         {
+            var query = new Dictionary<string, string>
+            {
+                ["type"] = type.ToString()
+            };
+
+            string uri = QueryHelpers.AddQueryString("/api/user/admin/getusers/", query);
+
             try
             {
-                using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/api/user/admin/getall"))
+                using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync(uri))
                 {
                     if (response.IsSuccessStatusCode)
                     {
@@ -39,6 +46,8 @@ namespace CMDesktopApp.Library.Api
                 throw;
             }
         }
+
+
         public async Task<UserModel> FindUserByEmail(string email)
         {
             var query = new Dictionary<string, string>

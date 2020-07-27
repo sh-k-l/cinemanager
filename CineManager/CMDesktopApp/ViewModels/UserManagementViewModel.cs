@@ -1,33 +1,165 @@
 ﻿using Caliburn.Micro;
+using CMDesktopApp.Events;
+using CMDesktopApp.Library;
 using CMDesktopApp.Library.Api;
 using CMDesktopApp.Library.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace CMDesktopApp.ViewModels
 {
     public class UserManagementViewModel : Screen
     {
+        private readonly IEventAggregator _events;
         private readonly IUserEndpoint _userEndpoint;
+        private BindingList<UserManagementSearchType> _searchTypes;
+        private UserManagementSearchType _selectedSearchTypes;
+        private BindingList<UserModel> _users;
 
-        public UserManagementViewModel(IUserEndpoint userEndpoint)
+
+        public UserManagementViewModel(IEventAggregator events, IUserEndpoint userEndpoint)
         {
+            _events = events;
             _userEndpoint = userEndpoint;
-            var x = FindByEmail("shakilchyy@gmail.com");
-            var y = FindByEmail("shakilchyy@l.com");
+            _users = new BindingList<UserModel>();
+            SearchTypes = new BindingList<UserManagementSearchType>(Enum.GetValues(typeof(UserManagementSearchType)) as IList<UserManagementSearchType>);
         }
 
-        private async Task GetAllUsers()
+        public BindingList<UserModel> Users
         {
-            var x = await _userEndpoint.GetAllUsers();
+            get
+            {
+                return _users;
+            }
+            set
+            {
+                _users = value;
+                NotifyOfPropertyChange(() => Users);
+            }
         }
 
-        private async Task<UserModel> FindByEmail(string email)
+        public BindingList<UserManagementSearchType> SearchTypes
+        { 
+            get
+            {
+                return _searchTypes;
+            }
+
+            set
+            {
+                _searchTypes = value;
+                NotifyOfPropertyChange(() => SearchTypes);
+            }
+        }
+
+        public UserManagementSearchType SelectedSearchType
         {
-            var user = await _userEndpoint.FindUserByEmail(email);
-            return user;
+            get
+            {
+                return _selectedSearchTypes;
+            }
+
+            set
+            {
+                _selectedSearchTypes = value;
+                NotifyOfPropertyChange(() => SelectedSearchType);
+                NotifyOfPropertyChange(() => ShowEmailSearchForm);          
+                FindUsers();
+                
+            }
+        }
+
+        public bool ShowEmailSearchForm
+        {
+            get
+            {
+                bool output = true;
+
+                if (_selectedSearchTypes != UserManagementSearchType.Email)
+                {
+                    output = false;
+                }
+                return output;
+            }
+        }
+
+        private string _email = "shakilchyy@gmail.com";
+        public string Email 
+        {
+            get
+            {
+                return _email;
+            }
+            set
+            {
+                _email = value;
+                NotifyOfPropertyChange(() => Email);
+                NotifyOfPropertyChange(() => CanSearchByEmail);
+
+
+            }
+        }
+
+        public bool CanSearchByEmail
+        {
+            get
+            {
+                return Email.Length > 0;
+            }
+        }
+
+        public void SearchByEmail()
+        {
+            FindByEmail(Email);
+        }
+
+        private async Task FindUsers()
+        {
+            if (SelectedSearchType == UserManagementSearchType.Email) {
+                return;
+            }
+
+            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
+
+            try
+            {
+                var users = await _userEndpoint.GetUsers(SelectedSearchType);
+                Users = new BindingList<UserModel>(users);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            }  
+        }
+
+
+
+        private async Task FindByEmail(string email)
+        {  
+            Users.Clear();
+            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
+            try
+            {
+                var user = await _userEndpoint.FindUserByEmail(email);
+                Users.Add(user);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            }
         }
     }
 }

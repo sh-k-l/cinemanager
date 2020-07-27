@@ -44,12 +44,11 @@ namespace CMApi.Controllers
                 }
             }
 
-            var user = await _userManager.FindByEmailAsync("shakilchyy@gmail.com");
+            var user = await _userManager.FindByEmailAsync("shakil.chowdhury@yahoo.com");
 
             if (user != null)
             {
-                await _userManager.AddToRoleAsync(user, "Admin");
-                await _userManager.AddToRoleAsync(user, "Cashier");
+                await _userManager.AddToRoleAsync(user, "Manager");
             }
             return View();
         }
