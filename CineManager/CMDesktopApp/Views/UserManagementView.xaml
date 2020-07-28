@@ -66,6 +66,8 @@
 
         <!--COL 2-->
         <StackPanel Orientation="Vertical" Grid.Column="2" Grid.Row="3" Margin="10">
+            <TextBlock x:Name="ErrorMessage" Foreground="Red" FontSize="12"
+                       Visibility="{Binding ShowErrorMessage, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
             <ListBox x:Name="UserRoles" MinHeight="100" MinWidth="100"></ListBox>
             <Button x:Name="RemoveRole">Remove Role</Button>
             <ComboBox x:Name="AddableRoles" MinWidth="100" Margin="0 10 0 0"></ComboBox>

@@ -25,8 +25,9 @@ namespace CMDesktopApp.ViewModels
         private BindingList<string> _userRoles;
         private bool _showNoUserFound = false;
         private List<string> _allRoles { get; set; } = new List<string>();
-        private string _selectedRoleToRemove;
-        private string _selectedRoleToAdd;
+        private string _selectedUserRole;
+        private string _selectedAddableRole;
+        private string _errorMessage;
 
 
         public UserManagementViewModel(IEventAggregator events, IUserEndpoint userEndpoint)
@@ -106,11 +107,11 @@ namespace CMDesktopApp.ViewModels
         {
             get
             {
-                return _selectedRoleToRemove;
+                return _selectedUserRole;
             }
             set
             {
-                _selectedRoleToRemove = value;
+                _selectedUserRole = value;
                 NotifyOfPropertyChange(() => SelectedUserRole);
                 NotifyOfPropertyChange(() => CanRemoveRole);
                 NotifyOfPropertyChange(() => AddableRoles);
@@ -122,11 +123,11 @@ namespace CMDesktopApp.ViewModels
         {
             get
             {
-                return _selectedRoleToAdd;
+                return _selectedAddableRole;
             }
             set
             {
-                _selectedRoleToAdd = value;
+                _selectedAddableRole = value;
                 NotifyOfPropertyChange(() => SelectedAddableRole);
                 NotifyOfPropertyChange(() => CanAddRole);
                 NotifyOfPropertyChange(() => UserRoles);
@@ -142,15 +143,47 @@ namespace CMDesktopApp.ViewModels
             }
         }
 
+       
+        public bool ShowErrorMessage
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(ErrorMessage) == false;
+            }
+        }
+        public string ErrorMessage
+        {
+            get { return _errorMessage; }
+            set 
+            { 
+                _errorMessage = value;
+                NotifyOfPropertyChange(() => ErrorMessage);
+                NotifyOfPropertyChange(() => ShowErrorMessage);
+            }
+        }
+
+
         public async Task AddRole()
         {
-            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
-            await _userEndpoint.AddUserToRole(SelectedUser.Id, SelectedAddableRole);
-            UserRoles.Add(SelectedAddableRole);
-            AddableRoles.Remove(SelectedAddableRole);
-            SelectedAddableRole = null;
-            SelectedUserRole = null;
-            await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            ErrorMessage = null;
+            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());   
+
+            try
+            {
+                await _userEndpoint.AddUserToRole(SelectedUser.Id, SelectedAddableRole);
+                UserRoles.Add(SelectedAddableRole);
+                AddableRoles.Remove(SelectedAddableRole);
+                SelectedAddableRole = null;
+                SelectedUserRole = null;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            }
         }
 
         public bool CanRemoveRole
@@ -163,14 +196,24 @@ namespace CMDesktopApp.ViewModels
 
         public async Task RemoveRole()
         {
-            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
-            await _userEndpoint.RemoveUserFromRole(SelectedUser.Id, SelectedUserRole);
-            AddableRoles.Add(SelectedUserRole);
-            UserRoles.Remove(SelectedUserRole);
-            SelectedUserRole = null;
-            SelectedAddableRole = null;
-
-            await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            ErrorMessage = null;
+            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());            
+            try
+            {
+                await _userEndpoint.RemoveUserFromRole(SelectedUser.Id, SelectedUserRole);
+                AddableRoles.Add(SelectedUserRole);
+                UserRoles.Remove(SelectedUserRole);
+                SelectedUserRole = null;
+                SelectedAddableRole = null;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            }
         }
 
         public BindingList<UserManagementSearchType> SearchTypes
