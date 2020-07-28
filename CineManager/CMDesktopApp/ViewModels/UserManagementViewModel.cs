@@ -22,8 +22,11 @@ namespace CMDesktopApp.ViewModels
         private UserManagementSearchType _selectedSearchTypes;
         private BindingList<UserModel> _users;
         private UserModel _selectedUser;
-        private BindingList<string> _rolesOnUser;
+        private BindingList<string> _userRoles;
+        private bool _showNoUserFound = false;
         private List<string> _allRoles { get; set; } = new List<string>();
+        private string _selectedRoleToRemove;
+        private string _selectedRoleToAdd;
 
 
         public UserManagementViewModel(IEventAggregator events, IUserEndpoint userEndpoint)
@@ -64,35 +67,34 @@ namespace CMDesktopApp.ViewModels
                 _selectedUser = value;
                 if(value != null)
                 {
-                    RolesOnUser = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
+                    UserRoles = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
                 }
                 NotifyOfPropertyChange(() => SelectedUser);
-                NotifyOfPropertyChange(() => RolesOnUser);
-                NotifyOfPropertyChange(() => RolesToAdd);
+                NotifyOfPropertyChange(() => UserRoles);
+                NotifyOfPropertyChange(() => AddableRoles);
             }
         }
 
-        public BindingList<string> RolesOnUser
+        public BindingList<string> UserRoles
         {
             get
             {
-                return _rolesOnUser;
+                return _userRoles;
             }
             set
             {
-                _rolesOnUser = value;
-                NotifyOfPropertyChange(() => RolesOnUser);
+                _userRoles = value;
+                NotifyOfPropertyChange(() => UserRoles);
             }
         }
 
-
-        public BindingList<string> RolesToAdd
+        public BindingList<string> AddableRoles
         {
             get
             {
                 BindingList<string> roleList = new BindingList<string>();
                 if (SelectedUser != null) {
-                    var roles = _allRoles.Where(x => RolesOnUser.Contains(x) == false).ToList();
+                    var roles = _allRoles.Where(x => UserRoles.Contains(x) == false).ToList();
                     roleList = new BindingList<string>(roles);
                 } 
                 
@@ -100,25 +102,75 @@ namespace CMDesktopApp.ViewModels
             }           
         }
 
+        public string SelectedUserRole
+        {
+            get
+            {
+                return _selectedRoleToRemove;
+            }
+            set
+            {
+                _selectedRoleToRemove = value;
+                NotifyOfPropertyChange(() => SelectedUserRole);
+                NotifyOfPropertyChange(() => CanRemoveRole);
+                NotifyOfPropertyChange(() => AddableRoles);
+                NotifyOfPropertyChange(() => UserRoles);
+            }
+        }
+
+        public string SelectedAddableRole
+        {
+            get
+            {
+                return _selectedRoleToAdd;
+            }
+            set
+            {
+                _selectedRoleToAdd = value;
+                NotifyOfPropertyChange(() => SelectedAddableRole);
+                NotifyOfPropertyChange(() => CanAddRole);
+                NotifyOfPropertyChange(() => UserRoles);
+
+            }
+        }
+
         public bool CanAddRole
         {
-            get { return false; }
+            get 
+            {
+                return string.IsNullOrWhiteSpace(SelectedAddableRole) == false;
+            }
         }
 
-        public void AddRole()
+        public async Task AddRole()
         {
-            throw new NotImplementedException();
+            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
+            await _userEndpoint.AddUserToRole(SelectedUser.Id, SelectedAddableRole);
+            UserRoles.Add(SelectedAddableRole);
+            AddableRoles.Remove(SelectedAddableRole);
+            SelectedAddableRole = null;
+            SelectedUserRole = null;
+            await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
         }
-
 
         public bool CanRemoveRole
         {
-            get { return false; }
+            get
+            {
+                return string.IsNullOrWhiteSpace(SelectedUserRole) == false;
+            }
         }
 
-        public void RemoveRole()
+        public async Task RemoveRole()
         {
-            throw new NotImplementedException();
+            await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
+            await _userEndpoint.RemoveUserFromRole(SelectedUser.Id, SelectedUserRole);
+            AddableRoles.Add(SelectedUserRole);
+            UserRoles.Remove(SelectedUserRole);
+            SelectedUserRole = null;
+            SelectedAddableRole = null;
+
+            await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
         }
 
         public BindingList<UserManagementSearchType> SearchTypes
@@ -148,11 +200,25 @@ namespace CMDesktopApp.ViewModels
                 NotifyOfPropertyChange(() => SelectedSearchType);
                 NotifyOfPropertyChange(() => ShowEmailSearchForm);
                 SelectedUser = null;
-                RolesOnUser = null;
+                UserRoles = null;
                 Users = null;
-                NotifyOfPropertyChange(() => RolesToAdd);
+                NotifyOfPropertyChange(() => AddableRoles);
 
                 FindUsers();                
+            }
+        }
+
+        public bool ShowNoUserFound
+        {
+            get 
+            {
+                return _showNoUserFound;
+            }
+
+            set
+            {
+                _showNoUserFound = value;
+                NotifyOfPropertyChange(() => ShowNoUserFound);
             }
         }
 
@@ -202,6 +268,7 @@ namespace CMDesktopApp.ViewModels
         private async Task FindUsers()
         {
             if (SelectedSearchType == UserManagementSearchType.Email) {
+                ShowNoUserFound = false;
                 return;
             }
 
@@ -229,7 +296,16 @@ namespace CMDesktopApp.ViewModels
             try
             {
                 var user = await _userEndpoint.FindUserByEmail(email);
-                Users.Add(user);
+                if(user != null)
+                {
+                    Users.Add(user);
+                    ShowNoUserFound = false;
+                }
+                else
+                {
+                    ShowNoUserFound = true;
+                }
+
             }
             catch (Exception)
             {
