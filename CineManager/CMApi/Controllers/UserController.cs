@@ -63,10 +63,13 @@ namespace CMApi.Controllers
 
                 u.Roles = userRoles.Where(x => x.UserId == u.Id).ToDictionary(key => key.RoleId, val => val.Name);
 
-                output.Add(u);
+                if(u.Roles.Values.ToList().IndexOf(type) != -1)
+                {
+                    output.Add(u);
+                }
             }
 
-            return output.Where(x => x.Roles.Values.IndexOf(type) != -1).ToList();
+            return output;
         }
 
         [HttpGet]

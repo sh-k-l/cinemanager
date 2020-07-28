@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using CMDesktopApp.Events;
+using CMDesktopApp.Helpers;
 using CMDesktopApp.Library;
 using CMDesktopApp.Library.Api;
 using CMDesktopApp.Library.Models;
@@ -66,10 +67,6 @@ namespace CMDesktopApp.ViewModels
             set
             {
                 _selectedUser = value;
-                if(value != null)
-                {
-                    UserRoles = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
-                }
                 NotifyOfPropertyChange(() => SelectedUser);
                 NotifyOfPropertyChange(() => UserRoles);
                 NotifyOfPropertyChange(() => AddableRoles);
@@ -80,12 +77,12 @@ namespace CMDesktopApp.ViewModels
         {
             get
             {
-                return _userRoles;
-            }
-            set
-            {
-                _userRoles = value;
-                NotifyOfPropertyChange(() => UserRoles);
+                List<string> list = new List<string>();
+                if(SelectedUser != null)
+                {
+                    list = SelectedUser.Roles.Select(x => x.Value).ToList();
+                }
+                return new BindingList<string>(list);
             }
         }
 
@@ -115,7 +112,6 @@ namespace CMDesktopApp.ViewModels
                 NotifyOfPropertyChange(() => SelectedUserRole);
                 NotifyOfPropertyChange(() => CanRemoveRole);
                 NotifyOfPropertyChange(() => AddableRoles);
-                NotifyOfPropertyChange(() => UserRoles);
             }
         }
 
@@ -171,10 +167,11 @@ namespace CMDesktopApp.ViewModels
             try
             {
                 await _userEndpoint.AddUserToRole(SelectedUser.Id, SelectedAddableRole);
-                UserRoles.Add(SelectedAddableRole);
+                SelectedUser.Roles.Add(SelectedAddableRole, SelectedAddableRole);                
                 AddableRoles.Remove(SelectedAddableRole);
                 SelectedAddableRole = null;
                 SelectedUserRole = null;
+                NotifyOfPropertyChange(() => UserRoles);
             }
             catch (Exception ex)
             {
@@ -202,9 +199,10 @@ namespace CMDesktopApp.ViewModels
             {
                 await _userEndpoint.RemoveUserFromRole(SelectedUser.Id, SelectedUserRole);
                 AddableRoles.Add(SelectedUserRole);
-                UserRoles.Remove(SelectedUserRole);
+                SelectedUser.Roles.RemoveByValue(SelectedUserRole);
                 SelectedUserRole = null;
                 SelectedAddableRole = null;
+                NotifyOfPropertyChange(() => UserRoles);
             }
             catch (Exception ex)
             {
@@ -243,8 +241,8 @@ namespace CMDesktopApp.ViewModels
                 NotifyOfPropertyChange(() => SelectedSearchType);
                 NotifyOfPropertyChange(() => ShowEmailSearchForm);
                 SelectedUser = null;
-                UserRoles = null;
                 Users = null;
+                NotifyOfPropertyChange(() => UserRoles);
                 NotifyOfPropertyChange(() => AddableRoles);
 
                 FindUsers();                
