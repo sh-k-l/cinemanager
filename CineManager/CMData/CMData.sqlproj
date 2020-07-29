@@ -67,7 +67,8 @@
     <Build Include="dbo\Tables\Showing.sql" />
     <Build Include="dbo\Tables\TicketBand.sql" />
     <Build Include="dbo\Tables\User.sql" />
-    <Build Include="dbo\Stored Procedures\spUserLookupByEmail.sql" />
+    <Build Include="dbo\Stored Procedures\spFilm_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spFilm_GetByDate.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="CMData.refactorlog" />

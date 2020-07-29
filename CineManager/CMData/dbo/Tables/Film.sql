@@ -6,6 +6,6 @@
     [ImageLink] NVARCHAR(MAX) NULL, 
     [TrailerLink] NVARCHAR(MAX) NULL, 
     [ReleaseDate] DATETIME2 NOT NULL, 
-    [Runtime] TIME NOT NULL, 
+    [Runtime] NVARCHAR(8) NOT NULL, 
     [Language] NCHAR(10) NOT NULL
 )

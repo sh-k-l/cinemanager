@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CMDesktopApp.Views"
-             mc:Ignorable="d" Background="AliceBlue"
+             mc:Ignorable="d" Background="AliceBlue" FontSize="18"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -29,19 +29,18 @@
         <!--Col 0-->
         <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" Margin="0 0 0 10">
             <TextBlock>Date:</TextBlock>
-            <ComboBox x:Name="Date" MinWidth="350px" MaxWidth="350px">
-                <ComboBoxItem>Something</ComboBoxItem>
-                <ComboBoxItem>Something</ComboBoxItem>
-                <ComboBoxItem>Something</ComboBoxItem>
+            <ComboBox x:Name="Dates" MinWidth="350px" MaxWidth="350px">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Display}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
             </ComboBox>
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="1" Margin="0 0 0 10">
             <TextBlock>Film:</TextBlock>
-            <ComboBox x:Name="Films" MinWidth="350px" MaxWidth="350px">
-                <ComboBoxItem>Something</ComboBoxItem>
-                <ComboBoxItem>Something</ComboBoxItem>
-                <ComboBoxItem>Something</ComboBoxItem>
+            <ComboBox x:Name="Films" MinWidth="350px" MaxWidth="350px" DisplayMemberPath="Title">
             </ComboBox>
         </StackPanel>
 
@@ -52,24 +51,30 @@
 
         <!--Col 1-->
         <StackPanel Orientation="Vertical" Grid.RowSpan="3" Grid.Row="1" Grid.Column="3">
-            <TextBlock>Tickets:</TextBlock>
-            <ItemsControl x:Name="Tickets">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="{Binding Name}"/>
-                                <TextBlock Text="{Binding Quantity}"/>
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <TextBlock Margin="0 0 0 20">Tickets:</TextBlock>
+
+            <Button x:Name="StudentTicket" Padding="10" Margin="5">
+                <StackPanel>
+                    <TextBlock>Student (<TextBlock x:Name="StudentPrice" Text="{Binding StudentPrice, StringFormat=C}" FontSize="11"/>)</TextBlock>
+                    <TextBlock Text="{Binding StudentQuantity}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="StandardTicket" Padding="10" Margin="5">
+                <StackPanel>
+                    <TextBlock>Standard (<TextBlock x:Name="StandardPrice" Text="{Binding StandardPrice, StringFormat=C}"  FontSize="11"/>)</TextBlock>
+                    <TextBlock Text="{Binding StandardQuantity}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+
+            <Button x:Name="PremierTicket" Padding="10" Margin="5">
+                <StackPanel>
+                    <TextBlock>Premier (<TextBlock x:Name="PremierPrice" Text="{Binding PremierPrice, StringFormat=C}" FontSize="11"/>)</TextBlock>
+                    <TextBlock Text="{Binding PremierQuantity}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
         </StackPanel>
 
         <Button x:Name="BookTickets" Grid.Column="3" Grid.Row="4" Padding="10">Book Tickets</Button>
