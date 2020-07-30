@@ -38,7 +38,9 @@ namespace CMDesktopApp
                 .Singleton<IAuthenticatedUser, AuthenticatedUser>()
                 .Singleton<IApiHelper, ApiHelper>()
                 .Singleton<IAuthEndpoint, AuthEndpoint>()
-                .Singleton<IUserEndpoint, UserEndpoint>();
+                .Singleton<IUserEndpoint, UserEndpoint>()
+                .Singleton<IShowingEndpoint, ShowingEndpoint>()
+                .Singleton<IFilmEndpoint, FilmEndpoint>();
 
             // New ViewModels on each request
             GetType().Assembly.GetTypes()

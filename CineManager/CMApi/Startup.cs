@@ -45,6 +45,7 @@ namespace CMApi
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<IUserData, UserData>();
             services.AddTransient<IFilmData, FilmData>();
+            services.AddTransient<IShowingData, ShowingData>();
 
             string secret = Configuration.GetValue<string>("Jwt:SecretKey");
             services.AddAuthentication(options =>

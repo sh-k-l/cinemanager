@@ -69,6 +69,7 @@
     <Build Include="dbo\Tables\User.sql" />
     <Build Include="dbo\Stored Procedures\spFilm_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\spFilm_GetByDate.sql" />
+    <Build Include="dbo\Stored Procedures\spShowing_GetByIdAndDate.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="CMData.refactorlog" />

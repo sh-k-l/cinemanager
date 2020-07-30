@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CMApi.Library.DataAccess;
+using CMApi.Library.Database;
+using CMApi.Library.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +14,18 @@ namespace CMApi.Controllers
     [ApiController]
     public class ShowingController : ControllerBase
     {
-        [HttpGet]
-        public List<ShowingModel> GetShowings(DateTime date, int id)
-        {
+        private readonly IShowingData _showingData;
 
+        public ShowingController(IShowingData showingData)
+        {
+            _showingData = showingData;
+        }
+        
+        [HttpGet]
+        public List<ShowingModel> GetShowingsByDateAndId(DateTime date, int id)
+        {
+            var result = _showingData.GetShowings(date, id);
+            return result;
         }
     }
 }

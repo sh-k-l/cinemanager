@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace CMDesktopApp.Library.Api
 {
-    public interface IFilmEndpoint
+    public interface IShowingEndpoint
     {
-        Task<List<FilmModel>> GetAllFilms();
-        Task<List<FilmModel>> GetFilmsByDate(string date);
+        Task<List<ShowingModel>> GetShowingsByIdAndDate(int id, DateTime date);
     }
 }

@@ -33,11 +33,11 @@ namespace CMDesktopApp.Library.Api
             }
         }
 
-        public async Task<List<FilmModel>> GetFilmsByDate(DateTime date)
+        public async Task<List<FilmModel>> GetFilmsByDate(string date)
         {
             var query = new Dictionary<string, string>
             {
-                ["date"] = date.ToString()
+                ["date"] = date
             };
 
             string uri = QueryHelpers.AddQueryString("/api/film/date", query);

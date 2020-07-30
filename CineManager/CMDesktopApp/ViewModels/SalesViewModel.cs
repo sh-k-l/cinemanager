@@ -14,6 +14,7 @@ namespace CMDesktopApp.ViewModels
     {
         private readonly IEventAggregator _events;
         private readonly IFilmEndpoint _filmEndpoint;
+        private readonly IShowingEndpoint _showingEndpoint;
 
         // Tickets
         private double _studentPrice = 5.99;
@@ -23,6 +24,10 @@ namespace CMDesktopApp.ViewModels
         private int _standardQuantity = 0;
         private int _premierQuantity = 0;
 
+        //Showings
+        private BindingList<ShowingModel> _showings;
+        private ShowingModel _selectedShowing;
+
         // Films
         private BindingList<FilmModel> _films;
         private FilmModel _selectedFilm;
@@ -31,20 +36,17 @@ namespace CMDesktopApp.ViewModels
         private BindingList<ComboBoxDatePairModel> _dates;
         private ComboBoxDatePairModel _selectedDate;
 
-
-
-        public SalesViewModel(IEventAggregator events, IFilmEndpoint filmEndpoint)
+        public SalesViewModel(IEventAggregator events, IFilmEndpoint filmEndpoint, IShowingEndpoint showingEndpoint)
         {
             _events = events;
             _filmEndpoint = filmEndpoint;
-
-            //_dates = new BindingList<string>();
+            _showingEndpoint = showingEndpoint;
         }
 
         protected override void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            LoadAllFilms();
+            //LoadAllFilms();
             InitialiseDates();
             
         }
@@ -90,8 +92,34 @@ namespace CMDesktopApp.ViewModels
             try
             {
                 await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
-                var res = await _filmEndpoint.GetFilmsByDate(SelectedDate.Value);
+                var res = await _filmEndpoint.GetFilmsByDate(SelectedDate.Value.ToString("yyyy-MM-dd"));
                 Films = new BindingList<FilmModel>(res);
+            }
+            catch (Exception ex)
+            {
+                // TODO
+                var date = SelectedDate;
+                throw;
+            }
+            finally
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            }
+        }
+
+        private async Task LoadShowingByIdAndDate()
+        {
+            if(SelectedDate == null || SelectedFilm == null)
+            {
+                Showings.Clear();
+                return;
+            }
+
+            try
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
+                var res = await _showingEndpoint.GetShowingsByIdAndDate(SelectedFilm.Id, SelectedDate.Value);
+                Showings = new BindingList<ShowingModel>(res);
             }
             catch (Exception ex)
             {
@@ -103,6 +131,28 @@ namespace CMDesktopApp.ViewModels
                 await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
             }
         }
+
+        public BindingList<ShowingModel> Showings
+        {
+            get { return _showings; }
+            set
+            {
+                _showings = value;
+                NotifyOfPropertyChange(() => Showings);
+            }
+        }
+
+        public ShowingModel SelectedShowing
+        {
+            get { return _selectedShowing; }
+            set
+            {
+                _selectedShowing = value;
+                NotifyOfPropertyChange(() => SelectedShowing);
+                NotifyOfPropertyChange(() => CanAddTicket);
+            }
+        }
+
 
         public BindingList<FilmModel> Films
         {
@@ -121,6 +171,7 @@ namespace CMDesktopApp.ViewModels
             {
                 _selectedFilm = value;
                 NotifyOfPropertyChange(() => SelectedFilm);
+                LoadShowingByIdAndDate();
             }
         }
 
@@ -180,8 +231,9 @@ namespace CMDesktopApp.ViewModels
             get { return _studentQuantity; }
             set
             {
-                _studentPrice = value;
+                _studentQuantity = value;
                 NotifyOfPropertyChange(() => StudentQuantity);
+                NotifyOfPropertyChange(() => Total);
             }
         }
 
@@ -190,8 +242,9 @@ namespace CMDesktopApp.ViewModels
             get { return _standardQuantity; }
             set
             {
-                _standardPrice = value;
+                _standardQuantity = value;
                 NotifyOfPropertyChange(() => StandardQuantity);
+                NotifyOfPropertyChange(() => Total);
             }
         }
 
@@ -202,6 +255,66 @@ namespace CMDesktopApp.ViewModels
             {
                 _premierQuantity = value;
                 NotifyOfPropertyChange(() => PremierQuantity);
+                NotifyOfPropertyChange(() => Total);
+            }
+        }
+
+        public bool CanAddTicket
+        {
+            get
+            {
+                return SelectedShowing != null;
+            }
+        }
+
+        public string Total
+        {
+            get
+            {
+                double total = (StudentPrice * StudentQuantity) + (StandardPrice * StandardQuantity) + (PremierPrice * PremierQuantity);
+                return $"Total: {total:C}";
+            }
+        }
+
+        private void HandleTicketChange(string type, int increment)
+        {
+            switch (type)
+            {
+                case "Student":
+                    StudentQuantity = StudentQuantity + increment < 0 ? 0 : StudentQuantity + increment;
+                    break;
+                case "Standard":
+                    StandardQuantity = StandardQuantity + increment < 0 ? 0 : StandardQuantity + increment;
+                    break;
+                case "Premier":
+                    PremierQuantity = PremierQuantity + increment < 0 ? 0 : PremierQuantity + increment;
+                    break;
+                default:
+                    break;
+            }
+            NotifyOfPropertyChange(() => CanBookTickets);
+        }
+
+        public void TestLeftClick(string type)
+        {
+            HandleTicketChange(type, 1);
+        }
+
+        public void TestRightClick(string type)
+        {
+            HandleTicketChange(type, -1);
+        }
+
+        public void BookTickets()
+        {
+
+        }
+
+        public bool CanBookTickets
+        {
+            get
+            {
+                return StudentQuantity > 0 || StandardQuantity > 0 || PremierQuantity > 0;
             }
         }
 

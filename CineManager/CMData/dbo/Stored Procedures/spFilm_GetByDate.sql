@@ -4,7 +4,7 @@ AS
 begin
 	set nocount on;
 
-	select distinct f.Title, CONVERT(date, s.[DateTime]) as [Date], s.ScreenId
+	select distinct f.*
 	from dbo.Film f
 	inner join dbo.Showing s
 	on s.FilmId = f.Id

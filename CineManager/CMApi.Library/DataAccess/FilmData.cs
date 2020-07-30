@@ -21,9 +21,9 @@ namespace CMApi.Library.DataAccess
             return results;
         }
 
-        public List<FilmModel> GetFilmsByDate(DateTime date)
+        public List<FilmModel> GetFilmsByDate(string date)
         {
-            var p = new { Date = date.ToString("yyyy-dd-MM") };
+            var p = new { Date = date };
 
             var results = _sql.LoadData<FilmModel, dynamic>("spFilm_GetByDate", p, "CineManagerData");
             return results;

@@ -4,9 +4,8 @@ using System.Collections.Generic;
 
 namespace CMApi.Library.DataAccess
 {
-    public interface IFilmData
+    public interface IShowingData
     {
-        List<FilmModel> GetAllFilms();
-        List<FilmModel> GetFilmsByDate(string date);
+        List<ShowingModel> GetShowings(DateTime date, int id);
     }
 }
