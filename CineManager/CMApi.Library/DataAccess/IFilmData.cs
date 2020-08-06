@@ -8,6 +8,7 @@ namespace CMApi.Library.DataAccess
     {
         void AddFilm(FilmModel film);
         void EditFilm(FilmModel film);
+        void DeleteFilm(string id);
         List<FilmModel> GetFilms();
         List<FilmModel> GetFilms(string date);
     }

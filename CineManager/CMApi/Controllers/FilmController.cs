@@ -44,9 +44,15 @@ namespace CMApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public void EditFilm(int id, FilmModel film)
+        public void EditFilm(string id, FilmModel film)
         {
             _filmData.EditFilm(film);
+        }
+
+        [HttpDelete("{id}")]
+        public void DeleteFilm(string id)
+        {
+            _filmData.DeleteFilm(id);
         }
     }
 }

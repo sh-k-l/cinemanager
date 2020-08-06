@@ -6,9 +6,11 @@ using CMDesktopApp.Library.Models;
 using CMDesktopApp.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace CMDesktopApp.ViewModels
 {
@@ -17,7 +19,7 @@ namespace CMDesktopApp.ViewModels
         private readonly IEventAggregator _events;
         private readonly IFilmEndpoint _filmEndpoint;
         private readonly IMapper _mapper;
-        private List<FilmDisplayModel> _films;
+        private BindingList<FilmDisplayModel> _films;
         private FilmDisplayModel _selectedFilm;
 
         private string _filmSearchText;
@@ -43,7 +45,7 @@ namespace CMDesktopApp.ViewModels
         }
 
 
-        public List<FilmDisplayModel> Films
+        public BindingList<FilmDisplayModel> Films
         {
             get 
             {
@@ -54,7 +56,8 @@ namespace CMDesktopApp.ViewModels
                 else
                 {
                     string search = _filmSearchText.Trim().ToLower();
-                    return _films.Where(film => film.Title.ToLower().Contains(search)).ToList();
+                    List<FilmDisplayModel> films = _films.Where(film => film.Title.ToLower().Contains(search)).ToList();
+                    return new BindingList<FilmDisplayModel>(films);
                 }
 
             }
@@ -74,7 +77,16 @@ namespace CMDesktopApp.ViewModels
                 NotifyOfPropertyChange(() => SelectedFilm);
                 NotifyOfPropertyChange(() => HaveSelectedFilm);
                 NotifyOfPropertyChange(() => CanSaveFilm);
-                SetInputs(SelectedFilm);
+                NotifyOfPropertyChange(() => CanDeleteFilm);
+
+                if(SelectedFilm != null)
+                {
+                    SetInputs(SelectedFilm);
+                }
+                else
+                {
+                    ClearInputs();
+                }
             }
         }
 
@@ -174,9 +186,27 @@ namespace CMDesktopApp.ViewModels
             };
         }
 
+        public void DeleteFilm()
+        {
+            string message = $"Are you sure you want to delete {SelectedFilm.Title}?";
+            MessageBoxResult messageBoxResult = MessageBox.Show(message, "Delete Confirmation", MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                HandleDeleteFilm(SelectedFilm);
+            }
+        }
+
+        public bool CanDeleteFilm
+        {
+            get
+            {
+                return SelectedFilm != null && SelectedFilm.Id != null;
+            }
+        }
+
         public void SaveFilm()
         {
-            if(SelectedFilm.Id == null)
+            if (SelectedFilm.Id == null)
             {
                 HandleAddFilm(SelectedFilm);
             }
@@ -201,7 +231,7 @@ namespace CMDesktopApp.ViewModels
             {
                 await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
                 var films = await _filmEndpoint.GetAllFilms();
-                Films = _mapper.Map<List<FilmDisplayModel>>(films);
+                Films = _mapper.Map<BindingList<FilmDisplayModel>>(films);
             }
             catch (Exception)
             {
@@ -237,6 +267,17 @@ namespace CMDesktopApp.ViewModels
             film.Language = FilmLanguage;
         }
 
+        private void ClearInputs()
+        {
+            FilmTitle = "";
+            FilmDescription = "";
+            FilmImage = "";
+            FilmTrailer = "";
+            FilmReleaseDate = DateTime.Today;
+            FilmRuntime = "";
+            FilmLanguage = "";
+        }
+
         private async Task HandleAddFilm(FilmDisplayModel film)
         {
             try
@@ -246,9 +287,8 @@ namespace CMDesktopApp.ViewModels
                 film.Id = Guid.NewGuid().ToString();
                 await _filmEndpoint.AddFilm(FilmDisplayModelToModel(film));
 
-                // HACK?
-                //Films.Add(film);
-                Films = Films.Select(x => x).Append(film).ToList();
+                Films.Add(film);
+                SelectedFilm = null;
             }
             catch (Exception)
             {
@@ -258,7 +298,6 @@ namespace CMDesktopApp.ViewModels
             {
                 await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
             }
-
         }
 
         private async Task HandleEditFilm(FilmDisplayModel film)
@@ -268,6 +307,27 @@ namespace CMDesktopApp.ViewModels
                 await _events.PublishOnUIThreadAsync(new LoadingOnEvent());
                 GetInputs(film);
                 await _filmEndpoint.EditFilm(FilmDisplayModelToModel(film));
+                SelectedFilm = null;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
+            }            
+        }
+
+        private async Task HandleDeleteFilm(FilmDisplayModel film)
+        {
+            try
+            {
+                await _events.PublishOnUIThreadAsync(new LoadingOnEvent());     
+                await _filmEndpoint.DeleteFilm(film.Id);
+
+                Films.Remove(film);               
+                SelectedFilm = null;
             }
             catch (Exception ex)
             {
@@ -277,7 +337,6 @@ namespace CMDesktopApp.ViewModels
             {
                 await _events.PublishOnUIThreadAsync(new LoadingOffEvent());
             }
-            
         }
 
         private FilmModel FilmDisplayModelToModel(FilmDisplayModel film)

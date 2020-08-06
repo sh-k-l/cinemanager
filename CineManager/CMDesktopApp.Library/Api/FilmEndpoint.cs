@@ -83,5 +83,16 @@ namespace CMDesktopApp.Library.Api
                 }
             }
         }
+
+        public async Task DeleteFilm(string id)
+        {
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.DeleteAsync($"/api/film/{id}"))
+            {
+                if (response.IsSuccessStatusCode == false)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
     }
 }

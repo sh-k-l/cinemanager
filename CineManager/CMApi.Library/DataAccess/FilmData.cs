@@ -38,5 +38,10 @@ namespace CMApi.Library.DataAccess
         {
             _sql.SaveData("spFilm_Update", film, "CineManagerData");
         }
+
+        public void DeleteFilm(string id)
+        {
+            _sql.SaveData("spFilm_Delete", new { Id = id}, "CineManagerData");
+        }
     }
 }

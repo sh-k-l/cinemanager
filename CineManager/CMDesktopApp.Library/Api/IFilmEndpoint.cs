@@ -11,5 +11,6 @@ namespace CMDesktopApp.Library.Api
         Task<List<FilmModel>> GetFilmsByDate(string date);
         Task<int> AddFilm(FilmModel film);
         Task EditFilm(FilmModel film);
+        Task DeleteFilm(string id);
     }
 }

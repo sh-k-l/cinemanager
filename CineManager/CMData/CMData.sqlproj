@@ -75,6 +75,7 @@
     <Build Include="dbo\Stored Procedures\spShowing_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\spFilm_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spFilm_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spFilm_Delete.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="CMData.refactorlog" />

@@ -39,8 +39,11 @@
                 <DataGridTextColumn Header="Release Date" Binding="{Binding DateOnly}" />
             </DataGrid.Columns>
         </DataGrid>
-        
-        <Button x:Name="AddNewFilm" Grid.Row="8" Grid.Column="0">Add New Film</Button>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="0">
+            <Button x:Name="AddNewFilm" Padding="10" Margin="0 0 10 0">Add New Film</Button>
+            <Button x:Name="DeleteFilm" Padding="10" Foreground="red">Delete</Button>
+        </StackPanel>
 
         <!-- Col 2 -->
         <!--<Button x:Name="AddFilm" Grid.Row="1" Grid.Column="2" Padding="5">Add</Button>-->
