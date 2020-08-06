@@ -1,7 +1,9 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using CMDesktopApp.Helpers;
 using CMDesktopApp.Library.Api;
 using CMDesktopApp.Library.Models;
+using CMDesktopApp.Models;
 using CMDesktopApp.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,19 @@ namespace CMDesktopApp
             Initialize();
         }
 
+        private IMapper ConfigureAutomapper()
+        {
+            var config = new MapperConfiguration(config => 
+            {
+                config.CreateMap<FilmModel, FilmDisplayModel>();
+                config.CreateMap<FilmDisplayModel, FilmModel>();
+            });
+
+            var output = config.CreateMapper();
+
+            return output;
+        }
+
         protected override void Configure()
         {
             // From: https://stackoverflow.com/questions/30631522/caliburn-micro-support-for-passwordbox
@@ -28,6 +43,7 @@ namespace CMDesktopApp
                 "Password",
                 "PasswordChanged");
 
+            _container.Instance(ConfigureAutomapper());
 
             // Dependency Injection
             _container.Instance(_container);

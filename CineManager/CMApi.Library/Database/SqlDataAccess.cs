@@ -42,7 +42,6 @@ namespace CMApi.Library.Database
             using (IDbConnection conn = new SqlConnection(connectionString))
             {
                 conn.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-
             }
         }
 

@@ -21,20 +21,32 @@ namespace CMApi.Controllers
         }
         
         [HttpGet]
-        [Route("/api/film")]
-        public List<FilmModel> GetAllFilms()
+        public List<FilmModel> GetAllFilms(string date = null)
         {
-            var result = _filmData.GetAllFilms();
+            List<FilmModel> result;
+
+            if(date == null)
+            {
+                result = _filmData.GetFilms();
+            }
+            else
+            {
+                result = _filmData.GetFilms(date);
+            }
+
             return result;
         }
 
-        [HttpGet]
-        [Route("/api/film/date")]
-        public List<FilmModel> GetFilmsByDate(string date)
+        [HttpPost]
+        public void AddFilm(FilmModel film)
         {
-            var result = _filmData.GetFilmsByDate(date);
-            return result;
+            _filmData.AddFilm(film);
         }
 
+        [HttpPut("{id}")]
+        public void EditFilm(int id, FilmModel film)
+        {
+            _filmData.EditFilm(film);
+        }
     }
 }

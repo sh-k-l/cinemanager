@@ -7,6 +7,6 @@ namespace CMDesktopApp.Library.Api
 {
     public interface IShowingEndpoint
     {
-        Task<List<ShowingModel>> GetShowingsByIdAndDate(int id, DateTime date);
+        Task<List<ShowingModel>> GetShowingsByIdAndDate(string id, DateTime date);
     }
 }

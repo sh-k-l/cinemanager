@@ -70,6 +70,11 @@
     <Build Include="dbo\Stored Procedures\spFilm_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\spFilm_GetByDate.sql" />
     <Build Include="dbo\Stored Procedures\spShowing_GetByIdAndDate.sql" />
+    <Build Include="dbo\Stored Procedures\spShowing_GetById.sql" />
+    <Build Include="dbo\Stored Procedures\spShowing_GetByDate.sql" />
+    <Build Include="dbo\Stored Procedures\spShowing_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spFilm_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\spFilm_Update.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="CMData.refactorlog" />

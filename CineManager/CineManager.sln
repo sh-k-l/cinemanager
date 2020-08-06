@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMApi.Library", "CMApi.Libr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMDesktopApp.Library", "CMDesktopApp.Library\CMDesktopApp.Library.csproj", "{F73AB446-98A8-463F-A8A5-0DBD05988AA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMApi.Library.Test", "CMApi.Library.Test\CMApi.Library.Test.csproj", "{1B621B6B-9212-429B-850B-C2F215826D4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMApi.Library.Test", "CMApi.Library.Test\CMApi.Library.Test.csproj", "{1B621B6B-9212-429B-850B-C2F215826D4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

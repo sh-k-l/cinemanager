@@ -6,7 +6,9 @@ namespace CMApi.Library.DataAccess
 {
     public interface IFilmData
     {
-        List<FilmModel> GetAllFilms();
-        List<FilmModel> GetFilmsByDate(string date);
+        void AddFilm(FilmModel film);
+        void EditFilm(FilmModel film);
+        List<FilmModel> GetFilms();
+        List<FilmModel> GetFilms(string date);
     }
 }

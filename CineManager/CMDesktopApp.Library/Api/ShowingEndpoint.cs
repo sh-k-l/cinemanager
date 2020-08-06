@@ -17,7 +17,7 @@ namespace CMDesktopApp.Library.Api
             _apiHelper = apiHelper;
         }
 
-        public async Task<List<ShowingModel>> GetShowingsByIdAndDate(int id, DateTime date)
+        public async Task<List<ShowingModel>> GetShowingsByIdAndDate(string id, DateTime date)
         {
             var query = new Dictionary<string, string>
             {

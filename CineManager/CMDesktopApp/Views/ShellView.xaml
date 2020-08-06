@@ -12,17 +12,20 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" FontSize="18">
             <MenuItem Header="_File">
-                <MenuItem x:Name="ExitApplication" Header="E_xit"/>
-            </MenuItem>
-            <MenuItem Header="_User"
-                    Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                 <MenuItem x:Name="LogOut" Header="Log _Out"/>
+                <MenuItem x:Name="ExitApplication" Header="E_xit"
+                          Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
             </MenuItem>
             <MenuItem Header="_Sales" x:Name="Sales"
                        Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
             <MenuItem Header="_Admin"
                     Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                 <MenuItem x:Name="UserManagement" Header="User _Management"/>
+            </MenuItem>
+            <MenuItem Header="_Manage"
+                    Visibility="{Binding IsManager, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                <MenuItem x:Name="FilmManagement" Header="_Films"/>
+                <MenuItem x:Name="ShowingManagement" Header="_Showings"/>
             </MenuItem>
         </Menu>
     <Grid>

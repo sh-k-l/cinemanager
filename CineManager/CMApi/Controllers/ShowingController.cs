@@ -22,9 +22,27 @@ namespace CMApi.Controllers
         }
         
         [HttpGet]
-        public List<ShowingModel> GetShowingsByDateAndId(DateTime date, int id)
+        public List<ShowingModel> GetShowingsByDateAndId(DateTime? date = null, int id = 0)
         {
-            var result = _showingData.GetShowings(date, id);
+            List<ShowingModel> result;
+
+            if(date == null && id == 0)
+            {
+                result = _showingData.GetShowings();
+            }
+            else if(date == null)
+            {
+                result = _showingData.GetShowings(id);
+            }
+            else if (id == 0)
+            {
+                result = _showingData.GetShowings((DateTime)date);
+            }
+            else
+            {
+                result = _showingData.GetShowings(id, (DateTime)date);
+            }
+
             return result;
         }
     }

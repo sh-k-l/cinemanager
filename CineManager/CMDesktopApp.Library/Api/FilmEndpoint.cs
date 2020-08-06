@@ -40,7 +40,7 @@ namespace CMDesktopApp.Library.Api
                 ["date"] = date
             };
 
-            string uri = QueryHelpers.AddQueryString("/api/film/date", query);
+            string uri = QueryHelpers.AddQueryString("/api/film", query);
 
             using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync(uri))
             {
@@ -50,6 +50,34 @@ namespace CMDesktopApp.Library.Api
                     return result;
                 }
                 else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+        public async Task<int> AddFilm(FilmModel film)
+        {
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/film", film))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    int id = await response.Content.ReadAsAsync<int>();
+                    return id;
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+
+        public async Task EditFilm(FilmModel film)
+        {
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PutAsJsonAsync($"/api/film/{film.Id}", film))
+            {
+                if (response.IsSuccessStatusCode == false)
                 {
                     throw new Exception(response.ReasonPhrase);
                 }

@@ -32,6 +32,11 @@ namespace CMDesktopApp.ViewModels
             ActivateItemAsync(IoC.Get<UserManagementViewModel>());
         }
 
+        public void FilmManagement()
+        {
+            ActivateItemAsync(IoC.Get<FilmViewModel>());
+        }
+
         public void Sales()
         {
             ActivateItemAsync(IoC.Get<SalesViewModel>());
@@ -41,6 +46,7 @@ namespace CMDesktopApp.ViewModels
         {
             NotifyOfPropertyChange(() => IsLoggedIn);
             NotifyOfPropertyChange(() => IsAdmin);
+            NotifyOfPropertyChange(() => IsManager);
         }
 
         public bool IsLoggedIn
@@ -56,6 +62,14 @@ namespace CMDesktopApp.ViewModels
             get
             {
                 return IsLoggedIn && _user.Roles.Contains("Admin");
+            }
+        }
+
+        public bool IsManager
+        {
+            get
+            {
+                return IsLoggedIn && _user.Roles.Contains("Manager");
             }
         }
 
